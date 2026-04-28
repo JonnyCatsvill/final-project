@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер-игра</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div id="auth-section">
+            <h2>Регистрация</h2>
+            <input type="text" id="reg-username" placeholder="Имя пользователя">
+            <input type="password" id="reg-password" placeholder="Пароль">
+            <button id="register-btn">Зарегистрироваться</button>
+
+            <h2>Вход</h2>
+            <input type="text" id="login-username" placeholder="Имя пользователя">
+            <input type="password" id="login-password" placeholder="Пароль">
+            <button id="login-btn">Войти</button>
+        </div>
+
+        <div id="game-section" style="display: none;">
+            <h1>Кликер</h1>
+            <p>Привет, <span id="username"></span>!</p>
+            <p>Количество кликов: <span id="click-count">0</span></p>
+            <button id="click-btn">Кликнуть!</button>
+            <button id="logout-btn">Выйти</button>
+            <button id="boost-btn">Буст кликов</button>
+        </div>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
