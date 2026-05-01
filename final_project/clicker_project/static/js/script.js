@@ -29,7 +29,6 @@ async function apiRequest(url, method, body = null) {
     }
     const response = await fetch(`${API_BASE}${url}`, options);
     if (response.status === 401) {
-        // Попытка обновить токен (для простоты – просто выходим)
         clearTokens();
         window.location.reload();
         throw new Error('Unauthorized');
@@ -37,7 +36,7 @@ async function apiRequest(url, method, body = null) {
     return response;
 }
 
-// ДОБАВЛЕНО: Глобальная переменная для хранения множителя буста
+// Глобальная переменная
 let boostCount = 1;
 
 // Регистрация
@@ -74,14 +73,13 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     }
 });
 
-// Загрузка профиля (счётчик кликов)
+// Загрузка профиля
 async function loadProfile() {
     const res = await apiRequest('profile/', 'GET');
     if (res.ok) {
         const data = await res.json();
         document.getElementById('username').innerText = data.username;
         document.getElementById('click-count').innerText = data.clicks;
-        // ДОБАВЛЕНО: Загрузка и отображение буста
         boostCount = data.boost_count;
         const boostElement = document.getElementById('boost-value');
         if (boostElement) boostElement.innerText = boostCount;
@@ -90,12 +88,10 @@ async function loadProfile() {
 
 // Клик
 document.getElementById('click-btn').addEventListener('click', async () => {
-    // ИЗМЕНЕНО: Отправляем на сервер количество кликов с учётом буста
     const res = await apiRequest('click/', 'POST', { clicks_to_add: boostCount });
     if (res.ok) {
         const data = await res.json();
         document.getElementById('click-count').innerText = data.clicks;
-        // ДОБАВЛЕНО: Обновляем буст если он изменился
         if (data.boost_count !== undefined) {
             boostCount = data.boost_count;
             const boostElement = document.getElementById('boost-value');
@@ -106,10 +102,22 @@ document.getElementById('click-btn').addEventListener('click', async () => {
     }
 });
 
-// ДОБАВЛЕНО: Покупка буста
+// Покупка буста с проверкой стоимости на клиенте
 const boostBtn = document.getElementById('boost-btn');
 if (boostBtn) {
     boostBtn.addEventListener('click', async () => {
+        // Получаем текущее количество кликов
+        const currentClicks = parseInt(document.getElementById('click-count').innerText);
+        // Рассчитываем стоимость
+        const cost = 100 * boostCount;
+
+        // Проверяем, хватает ли кликов
+        if (currentClicks < cost) {
+            alert(`Недостаточно кликов! Нужно ${cost} кликов. У вас ${currentClicks} кликов.`);
+            return;
+        }
+
+        // Отправляем запрос на покупку буста
         const res = await apiRequest('buy_boost/', 'POST', {});
         if (res.ok) {
             const data = await res.json();
@@ -151,7 +159,6 @@ async function checkAuth() {
             const data = await res.json();
             document.getElementById('username').innerText = data.username;
             document.getElementById('click-count').innerText = data.clicks;
-            // ДОБАВЛЕНО: Загрузка буста при проверке авторизации
             boostCount = data.boost_count;
             const boostElement = document.getElementById('boost-value');
             if (boostElement) boostElement.innerText = boostCount;
